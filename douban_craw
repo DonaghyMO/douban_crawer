@@ -1,0 +1,37 @@
+#_author:Administrator
+#date: 2020/2/9
+import requests
+import re
+def getonepage(url):
+    headers = {
+        "User-agent":"Mozilla/5.0"
+    }
+    try:
+        r = requests.get(url,headers=headers,timeout= 60)
+        r.raise_for_status()
+        r.encoding = r.apparent_encoding
+        #print(r.text)
+        return r.text
+    except Exception as e:
+        print(e)
+
+def parseonepage(html):
+    str = "href=\"(.*?)\".*?title=\"(.*?)\""
+    pattern = re.compile(str,re.S)
+    #print(html)
+    results = re.findall(pattern,html)
+    return results
+
+def printpage(lis):
+    with open("result.txt","w",encoding="utf-8") as f:
+        for i in range(len(lis)):
+            st = "排行："+str(i+1)+"\n"+"影片："+str(lis[i][1])+"\n"+"链接："+str(lis[i][0])+"\n\n"
+            f.write(st)
+
+
+def main():
+    htmltext = getonepage("https://movie.douban.com/chart")
+    lis=parseonepage(htmltext)
+    printpage(lis)
+
+main()
